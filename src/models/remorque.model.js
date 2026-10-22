@@ -5,7 +5,8 @@ const remorqueSchema = new mongoose.Schema({
   type: { type: String, required: true },
   kmCumule: { type: Number, default: 0 },
   statut: { type: String, enum: ['disponible', 'maintenance', 'en_trajet'], default: 'disponible' },
-  archive: { type: Boolean, default: false }
+  archive: { type: Boolean, default: false },
+  verrouJusquA: { type: Date, default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Remorque', remorqueSchema);
