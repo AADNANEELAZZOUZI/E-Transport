@@ -1,29 +1,64 @@
 {
   "name": "api-gestion-flotte-transport",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "FleetTrackPRO 2.0 - API REST de gestion de flotte de transport routier",
+  "main": "src/server.js",
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "seed:admin": "node scripts/seed-admin.js",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js",
+      "!src/docs/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 70,
+        "lines": 70,
+        "statements": 70
+      }
+    }
+  },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1155.0",
+    "@aws-sdk/s3-request-presigner": "^3.1155.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.7.1",
+    "express-slow-down": "^3.1.1",
+    "ioredis": "^6.0.0",
     "joi": "^18.2.9",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.10.2"
+    "mongoose": "^9.10.2",
+    "pdfkit": "^0.20.2",
+    "prom-client": "^15.1.3",
+    "rate-limit-redis": "^6.0.1",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "aws-sdk-client-mock": "^4.1.0",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
     "jest": "^30.5.2",
+    "mingo": "^7.2.5",
     "mockingoose": "^3.0.0",
     "nodemon": "^3.1.14",
     "supertest": "^7.3.1"
