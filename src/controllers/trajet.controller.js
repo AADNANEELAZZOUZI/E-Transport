@@ -1,47 +1,25 @@
-const Trajet = require('../models/trajet.model');
-const { checkAvailabilityAndStatus } = require('../services/availability.service');
+const trajetService = require('../services/trajet.service');
 
-// Créer et assigner un trajet (Admin uniquement)
 exports.createTrajet = async (req, res) => {
-  try {
-    const { siteDepart, siteArrivee, marchandise, dateDebutPrevue, dateFinPrevue, chauffeur, camion, remorque } = req.body;
-
-    // Appel du service unique de disponibilité (DRY) -> Lève une erreur 409 ou 404 en cas de problème
-    await checkAvailabilityAndStatus(camion, remorque, chauffeur, dateDebutPrevue, dateFinPrevue);
-
-    const trajet = await Trajet.create({
-      siteDepart,
-      siteArrivee,
-      marchandise,
-      dateDebutPrevue,
-      dateFinPrevue,
-      chauffeur,
-      camion,
-      remorque,
-      statut: 'a_faire'
-    });
-
-    res.status(201).json({ message: 'Trajet créé et assigné avec succès', trajet });
-  } catch (error) {
-    res.status(error.status || 500).json({ message: error.message || 'Erreur serveur' });
-  }
+  const trajet = await trajetService.creerTrajet(req.body);
+  res.status(201).json({ message: 'Trajet créé et assigné avec succès', trajet });
 };
 
-// Consulter les trajets (Admin voit tout, Chauffeur ne voit que les siens)
-exports.getTrajets = async (req, res) => {
-  try {
-    let filter = {};
-    if (req.user.role === 'chauffeur') {
-      filter.chauffeur = req.user.id;
-    }
+exports.getTrajets = async (req, res) => res.json(await trajetService.listerTrajets(req.user, req.query));
 
-    const trajets = await Trajet.find(filter)
-      .populate('chauffeur', 'nom email')
-      .populate('camion', 'immatriculation marque modele')
-      .populate('remorque', 'immatriculation type');
+exports.getTrajet = async (req, res) => res.json(await trajetService.obtenirTrajet(req.params.id, req.user));
 
-    res.json(trajets);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur serveur', error: error.message });
-  }
+exports.demarrerTrajet = async (req, res) => {
+  const trajet = await trajetService.demarrerTrajet(req.params.id, req.user, req.body);
+  res.json({ message: 'Trajet démarré', trajet });
+};
+
+exports.terminerTrajet = async (req, res) => {
+  const { trajet, consommationL100 } = await trajetService.terminerTrajet(req.params.id, req.user, req.body);
+  res.json({ message: 'Trajet clôturé avec succès', trajet, consommationL100 });
+};
+
+exports.revenirEnArriere = async (req, res) => {
+  const trajet = await trajetService.revenirEnArriere(req.params.id, req.body.statut);
+  res.json({ message: 'Statut du trajet modifié par l\'administrateur', trajet });
 };
